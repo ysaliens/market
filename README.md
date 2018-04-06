@@ -1,2 +1,2 @@
-# market
+# Virtual Cryptocurrency Market
 Virtual Cryptocurrency Market
