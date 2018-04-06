@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<link rel="icon"
+      type="image/png"
+      href="/img/favicon.ico" />
+<html>
+  <head>
+    <link rel="stylesheet" href="/css/main.css">
+  </head>
+  <body>
+    {{if .seen}}
+      <h1>Welcome back {{ .email }}.</h1>
+      <h3>You have no new notifications.</h3>
+      <a href="{{ .account }}"><button>Trade</button></a>
+    
+    {{else}}
+      <h1>Welcome {{ .email }}.</h1>
+      <h3>An account has been created for you.<br />
+        Your account has been credited with $10000. <br />
+        Click below to start trading.<br />
+      <a href="{{ .account }}"><button>Trade</button></a>
+
+    {{end}}
+  </body>
+</html>
