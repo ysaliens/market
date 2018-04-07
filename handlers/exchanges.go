@@ -8,6 +8,9 @@ import (
 	"sync"
 )
 
+//TODO: If more exchanges are added
+//Split package into files for each exchange
+
 // Coinbase JSON objects
 type Coinbase struct {
 	Data CoinbaseData
@@ -108,16 +111,16 @@ func getTicker(price *Cryptos, ticker string){
 		}
 		//fmt.Printf("%v: %v\n",ticker, c.Data.Amount) 
 	} else {
-		response, err := getContent(url)
-		responsePoloniex, errP := getContent(url2)
-		err = json.Unmarshal(response, &b)
-		if err != nil || errP != nil {
-			fmt.Printf("Error: %v", err)
+		responseB, errB := getContent(url)
+		responseP, errP := getContent(url2)
+		if errB != nil || errP != nil {
+			fmt.Printf("Error: %v\n%v\n", errB,errP)
 			return
 		}
-		errP = json.Unmarshal(responsePoloniex, &p)
-		if err !=nil {
-			fmt.Printf("Failed updating price: %v", err)
+		errB = json.Unmarshal(responseB, &b)
+		errP = json.Unmarshal(responseP, &p)
+		if errB !=nil || errP != nil {
+			fmt.Printf("Failed updating price: %v\n%v\n", errB,errP)
 			return
 		}
 		tickerP, _ := p["BTC_"+ticker]
@@ -169,4 +172,3 @@ func CreateTickers() *Cryptos{
 	}
 	return price
 }
-
