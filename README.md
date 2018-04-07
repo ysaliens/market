@@ -36,5 +36,7 @@ The server routine (and any subroutines it spawns for users) are passed the addr
 ## TO-DOs
 * __Re-write exchanges update code.__ Current code requests updates per ticker from exchanges - spawning routines for every ticker. While this works great for a proof of concept such as this application (low number of tickers and a slow refresh rate (15 sec)), it is suboptimal. A more scalable approach would be to spawn routines per every exchange supported. Each of those routines would get all the tickers supported from the exchange and map them. An update function would then look up data from the maps to update the price struct. The exchanges.go file would become it's own package and be broken down into files based on exchange. I did not have time to do this.
 * __Automated unit testing__ As I re-wrote things a lot (testing by hand), I did not have time to write automated unit tests. Golang has very good support for testing and given more time I would add that.
+* __Better Logout__ The current logout button is a redirect to the login page allowing another login. To logout, one needs to log out of the Google account they used before logging as a different user in CryptoMarket.
 * __Human Friendly Floats__ I would like to use the [Decimal Package](https://github.com/shopspring/decimal) for a better representation of floats on the UI (and more accurate compute)
-* __UI Improvements__ The UI could use a lot of love. Since Golang cannot run client-side code, adding some Javascript and an a new design would really help CryptoMarket.
+* __UI Improvements__ The UI could use a lot of love. Since Golang cannot run client-side code, adding some Javascript and a new design would really help CryptoMarket.
+
