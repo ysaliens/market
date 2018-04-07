@@ -8,29 +8,49 @@ import (
 	"sync"
 )
 
-// Coinbase JSON object is compound
+// Coinbase JSON objects
 type Coinbase struct {
 	Data CoinbaseData
 }
-
-// Amount is spot price
 type CoinbaseData struct {
 	Amount float64 `json:",string"`
 	Currency string
 }
 
-// Bittrex JSON is also compound
+// Bittrex JSON
 type Bittrex struct {
 	Success bool
 	Message string
-	Data BittrexData `json:"result"`
+	Data []BittrexData `json:"result"`
+}
+type BittrexData struct {
+	MarketName string  `json:"MarketName"`
+	High	   float64 `json:"High"`
+	Low		   float64 `json:"Low"`
+	Volume     float64 `json:"Volume"`
+	Last       float64 `json:"Last"`
+	BaseVolume float64 `json:"BaseVolume"`
+	TimeStamp  string  `json:"TimeStamp"`
+	Bid        float64 `json:"Bid"`
+	Ask        float64 `json:"Ask"`
+	OpenBuyOrders int  `json:"OpenBuyOrders"`
+	OpenSellOrders int `json:"OpenSellOrders"`
+	PrevDay    float64 `json:"PrevDay"`
+	Created    string  `json:"PrevDay"`
 }
 
-// Use last price as spot price
-type BittrexData struct {
-	Bid  float64
-	Ask  float64
-	Amount float64 `json:"last"`
+// Poloniex JSON
+type Poloniex struct {
+	Id            int     `json:"id"`
+	Last          float64 `json:"last,string"`
+	LowestAsk     float64 `json:"lowestAsk,string"`
+	HighestBid    float64 `json:"highestBid,string"`
+	PercentChange float64 `json:"percentChange,string"`
+	BaseVolume    float64 `json:"baseVolume,string"`
+	QuoteVolume   float64 `json:"quoteVolume,string"`
+	IsFrozen      int     `json:"isFrozen,string"`
+	High24Hr      float64 `json:"high24hr,string"`
+	Low24Hr       float64 `json:"low24hr,string"`
 }
 
 // This holds all prices
@@ -55,41 +75,58 @@ func getContent(url string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-// Function to update the price of a single ticker
+// Function to update the price for a single ticker
 // Ran concurrently for each ticker
 // Last price is kept if an error occurs updating it
+// For alt-coins, price is calculated as a volume-weighted average price
+// TO-DO: If more coins are tracked, re-write this based on exchanges and NOT tickers
 func getTicker(price *Cryptos, ticker string){
-	var url string
-	var b Coinbase
-	var alt Bittrex
+	var c Coinbase
+	var b Bittrex
+	var p map[string]Poloniex
+	var url,url2 string		
+	var vPrice float64
 
 	// Get API URL
 	if ticker == "BTC" {
 		url = "https://api.coinbase.com/v2/prices/spot?currency=USD"
 	} else {
-		url = "https://bittrex.com/api/v1.1/public/getticker?market="+ticker
+		url = "https://bittrex.com/api/v1.1/public/getmarketsummary?market="+"BTC-"+ticker
+		url2 = "https://poloniex.com/public?command=returnTicker"
 	}
 
-	// Get price as a JSON object
-	response, err := getContent(url)
-	if err != nil {
-		fmt.Printf("Error: %v", err)
-		return
-	}
-
-	// Decode
+	// Get JSON and decode
 	if ticker == "BTC" {
-		if err = json.Unmarshal(response, &b); err !=nil {
+		response, err := getContent(url)
+		if err != nil {
+			fmt.Printf("Error: %v", err)
+			return
+		}
+		if err = json.Unmarshal(response, &c); err !=nil {
 			fmt.Printf("Failed updating price: %v", err)
 			return
 		}
-		fmt.Printf("%v: |%v|\n",ticker, b.Data.Amount) 
+		//fmt.Printf("%v: %v\n",ticker, c.Data.Amount) 
 	} else {
-		if err = json.Unmarshal(response, &alt); err !=nil {
+		response, err := getContent(url)
+		responsePoloniex, errP := getContent(url2)
+		err = json.Unmarshal(response, &b)
+		if err != nil || errP != nil {
+			fmt.Printf("Error: %v", err)
+			return
+		}
+		errP = json.Unmarshal(responsePoloniex, &p)
+		if err !=nil {
 			fmt.Printf("Failed updating price: %v", err)
 			return
 		}
-		fmt.Printf("%v: |%v|\n",ticker, alt.Data.Amount) 
+		tickerP, _ := p["BTC_"+ticker]
+		//fmt.Printf("Bittrex  %v Price: %v Volume: %v\n",ticker,b.Data[0].Last, b.Data[0].Volume )
+		//fmt.Printf("Poloniex %v Price: %v Volume: %v\n",ticker,tickerP.Last, tickerP.QuoteVolume )
+
+		// Volume Weighted Average Price
+		vPrice = ((b.Data[0].Volume*b.Data[0].Last) + (tickerP.QuoteVolume*tickerP.Last)) / (b.Data[0].Volume + tickerP.QuoteVolume)
+		//fmt.Printf("%v: %v\n",ticker,vPrice)
 	}
 
 	// Update price struct, lock rw mutex for writing
@@ -97,13 +134,13 @@ func getTicker(price *Cryptos, ticker string){
 	price.Lock.Lock()
 	switch ticker {
 		case "BTC":
-				price.BTC     = b.Data.Amount
-		case "BTC-LTC":
-				price.BTCLTC  = alt.Data.Amount
-		case "BTC-DOGE":
-				price.BTCDOGE = alt.Data.Amount
-		case "BTC-XMR":
-				price.BTCXMR  = alt.Data.Amount
+				price.BTC     = c.Data.Amount
+		case "LTC":
+				price.BTCLTC  = vPrice
+		case "DOGE":
+				price.BTCDOGE = vPrice
+		case "XMR":
+				price.BTCXMR  = vPrice
 	}
 	price.Lock.Unlock()
 }
@@ -113,7 +150,8 @@ func getTicker(price *Cryptos, ticker string){
 // Currently written to easily add more tickers
 // If we add more exchanges, re-write this based on exchanges
 func UpdateTickers(price *Cryptos){
-	currencies := [4]string{"BTC","BTC-LTC","BTC-DOGE","BTC-XMR"}
+	currencies := [4]string{"BTC","LTC","DOGE","XMR"}
+	//currencies := [4]string{"BTC","BTC-LTC","BTC-DOGE","BTC-XMR"}
 	for _ , currency := range currencies {
 		go getTicker(price, currency)
 	}
