@@ -8,9 +8,6 @@ import (
 	"sync"
 )
 
-//TODO: If more exchanges are added
-//Split package into files for each exchange
-
 // Coinbase JSON objects
 type Coinbase struct {
 	Data CoinbaseData
@@ -80,9 +77,14 @@ func getContent(url string) ([]byte, error) {
 
 // Function to update the price for a single ticker
 // Ran concurrently for each ticker
-// Last price is kept if an error occurs updating it
 // For alt-coins, price is calculated as a volume-weighted average price
-// TO-DO: If more coins are tracked, re-write this based on exchanges and NOT tickers
+// -----------------------------------------------------------------------------------------------------
+// TO-DO: If more coins are tracked, re-write this based on exchanges and NOT tickers.
+//        Currently, it is faster and simpler being ticker-based due to low number of tickers
+//        and the slow poll rate. With a lot more coins added, it becomes optimal to get all market
+//        data from every exchange at once, map it, and then consult the maps for prices of every ticker.
+//        At that point, split into own package (exchanges) + break into files for every exchange.
+// -----------------------------------------------------------------------------------------------------
 func getTicker(price *Cryptos, ticker string){
 	var c Coinbase
 	var b Bittrex
