@@ -24,7 +24,7 @@ func main() {
 	store  := sessions.NewCookieStore([]byte(handlers.RToken(64)))
 	store.Options(sessions.Options{
 		Path:   "/",
-		MaxAge: 86400 * 7,
+		MaxAge: 86400 * 7, // Session lasts 1 week
 	})
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())

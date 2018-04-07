@@ -64,7 +64,7 @@ func TradeHandler(price *Cryptos, address string) gin.HandlerFunc {
 		// Assuming perfect, instant execution which doesn't happen.
 		// Proof of concept. Real market orders have % buffers
 		userErr := "" // Message to send back to user if amounts error
-		log.Printf("ORDER: |%v| |%v| |%v|",form.Trade,form.Currency,form.Amount)
+		//log.Printf("ORDER: |%v| |%v| |%v|",form.Trade,form.Currency,form.Amount)
 		switch form.Trade {
 		case "Market Buy":
 			switch form.Currency {
@@ -98,7 +98,7 @@ func TradeHandler(price *Cryptos, address string) gin.HandlerFunc {
 				}
 			}
 		case "Market Sell":
-			log.Printf("ORDER: |%v| |%v| |%v|",form.Trade,form.Currency,form.Amount)
+			//log.Printf("ORDER: |%v| |%v| |%v|",form.Trade,form.Currency,form.Amount)
 			switch form.Currency {
 			case "BTC":
 				if (uFound.BTC >= form.Amount){

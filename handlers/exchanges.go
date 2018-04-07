@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"log"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -104,34 +104,32 @@ func getTicker(price *Cryptos, ticker string){
 	if ticker == "BTC" {
 		response, err := getContent(url)
 		if err != nil {
-			fmt.Printf("Error: %v", err)
+			log.Printf("Error: %v", err)
 			return
 		}
 		if err = json.Unmarshal(response, &c); err !=nil {
-			fmt.Printf("Failed updating price: %v", err)
+			log.Printf("Failed updating price: %v", err)
 			return
 		}
-		//fmt.Printf("%v: %v\n",ticker, c.Data.Amount) 
 	} else {
 		responseB, errB := getContent(url)
 		responseP, errP := getContent(url2)
 		if errB != nil || errP != nil {
-			fmt.Printf("Error: %v\n%v\n", errB,errP)
+			log.Printf("Error: %v\n%v\n", errB,errP)
 			return
 		}
 		errB = json.Unmarshal(responseB, &b)
 		errP = json.Unmarshal(responseP, &p)
 		if errB !=nil || errP != nil {
-			fmt.Printf("Failed updating price: %v\n%v\n", errB,errP)
+			log.Printf("Failed updating price: %v\n%v\n", errB,errP)
 			return
 		}
 		tickerP, _ := p["BTC_"+ticker]
-		//fmt.Printf("Bittrex  %v Price: %v Volume: %v\n",ticker,b.Data[0].Last, b.Data[0].Volume )
-		//fmt.Printf("Poloniex %v Price: %v Volume: %v\n",ticker,tickerP.Last, tickerP.QuoteVolume )
+		//log.Printf("Bittrex  %v Price: %v Volume: %v\n",ticker,b.Data[0].Last, b.Data[0].Volume )
+		//log.Printf("Poloniex %v Price: %v Volume: %v\n",ticker,tickerP.Last, tickerP.QuoteVolume )
 
 		// Volume Weighted Average Price
 		vPrice = ((b.Data[0].Volume*b.Data[0].Last) + (tickerP.QuoteVolume*tickerP.Last)) / (b.Data[0].Volume + tickerP.QuoteVolume)
-		//fmt.Printf("%v: %v\n",ticker,vPrice)
 	}
 
 	// Update price struct, lock rw mutex for writing
@@ -156,11 +154,11 @@ func getTicker(price *Cryptos, ticker string){
 // If we add more exchanges, re-write this based on exchanges
 func UpdateTickers(price *Cryptos){
 	currencies := [4]string{"BTC","LTC","DOGE","XMR"}
-	//currencies := [4]string{"BTC","BTC-LTC","BTC-DOGE","BTC-XMR"}
 	for _ , currency := range currencies {
 		go getTicker(price, currency)
 	}
-	fmt.Printf("BTC: %v | LTC: %v | DOGE: %v | XMR: %v\n\n",price.BTC,price.BTCLTC,price.BTCDOGE,price.BTCXMR)
+	// Uncomment to see coin prices at every update tick
+	//log.Printf("BTC: %v | LTC: %v | DOGE: %v | XMR: %v\n",price.BTC,price.BTCLTC,price.BTCDOGE,price.BTCXMR)
 }
 
 // Initialize prices struct

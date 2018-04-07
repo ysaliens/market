@@ -41,18 +41,18 @@
     <h2>Balance</h2>
      <h3>Account total: ${{ .total }}</h3>
      <p>USD: {{ .USD }}<br /> 
-          Bitcoin (BTC): {{ .BTC }}<br /> 
+          Bitcoin  (BTC): {{ .BTC }}<br /> 
           LiteCoin (LTC): {{ .LTC }}<br /> 
           DogeCoin (DOGE): {{ .DOGE }}<br /> 
-          Monero (XMR): {{ .XMR }}
+          Monero   (XMR): {{ .XMR }}
       </p>
   </div>
   <div class="column" style="background-color: #1C91FF;">
     <h2>Current Market Price</h2><br />
-      <p>Bitcoin (BTC): {{ .marketBTC }}<br /> 
-          LiteCoin (LTC): {{ .marketLTC }}<br /> 
-          DogeCoin (DOGE): {{ .marketDOGE }}<br /> 
-          Monero (XMR): {{ .marketXMR }}<br />
+      <p>Bitcoin   (BTC): ${{ .marketBTC }}<br /> 
+          LiteCoin (LTC): {{ .marketLTC }} BTC<br /> 
+          DogeCoin (DOGE): {{ .marketDOGE }} BTC<br /> 
+          Monero   (XMR): {{ .marketXMR }} BTC<br />
           <a href="{{ .link }}"><button>Refresh Prices</button></a>
       </p>
   </div>

@@ -28,7 +28,6 @@ func AccountHandler(price *Cryptos, address string) gin.HandlerFunc {
 
 		// Get current ticker prices for trade and release object for updates (Read lock)
 		price.Lock.RLock()
-		log.Printf("BTC: %v | LTC: %v | DOGE: %v | XMR: %v\n",price.BTC,price.BTCLTC,price.BTCDOGE,price.BTCXMR)
 		BTC     := price.BTC
 		BTCLTC  := price.BTCLTC
 		BTCDOGE := price.BTCDOGE
