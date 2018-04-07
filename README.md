@@ -9,10 +9,8 @@ Once logged in, the user can check their balance as well as buy and sell cryptoc
 ## Setup
 * Install [Go](https://golang.org/)
 * Install [MongoDB](https://www.mongodb.com/download-center?jmp=homepage#community)
-* Add Go to PATH
-* Add $GOPATH ("C:\Users\\$USER\go") to PATH
-* Add MongoDB to PATH
-* `go get github.com/ysaliens/market` to get project files and all dependencies
+* Add $GOPATH ("C:\Users\\$USER\go") and MongoDB to PATH
+* `go get github.com/ysaliens/market` to get project files and all dependencies. This can take a while for a new install.
 * `mkdir $GOPATH/src/github.com/ysaliens/market/database/db` <--- This is where database files will be stored
 * `cd $GOPATH/src/github.com/ysaliens/market/`
 
