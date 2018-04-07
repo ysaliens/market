@@ -27,7 +27,7 @@ If missing dependencies (or used git clone), run `go get -v ./...` to get all de
 * Navigate to `http://localhost:8080`
 
 ## Architecture
-CryptoMarket uses MongoDB for database. It is written in Golang utilizing the high-performance Gin-Gonic framework. Google's OAuth2 is used for authentication with full support for sessions. This avoids having to encrypt, salt, or store passwords and is a welcome change for users.
+CryptoMarket uses MongoDB for a database. It is written in Golang utilizing the high-performance Gin-Gonic framework. Google's OAuth2 is used for authentication with full support for sessions and secure end points. This avoids having to encrypt, salt, or store passwords and is a welcome change for users.
 
 When the server starts, it breaks into two main routines - server routine and exchanges routine. By default, every 15 seconds the exchanges routine will spawn four (BTC, LTC, DOGE, XMR) routines that will query the exchanges for the price of each ticker. Two exchanges (Bittrex and Poloniex) will be volume weighted to create the price for alt coins (LTC, DOGE, XMR). For Bitcoin (BTC), only Coinbase is currently used. 
 
