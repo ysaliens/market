@@ -1,2 +1,4 @@
-# Virtual Cryptocurrency Market
-Virtual Cryptocurrency Market
+# CryptoMarket
+CryptoMarket is a virtual cryptocurrency market supporting BTC, LTC, DOGE, and XMR written in Golang.
+
+## About 
